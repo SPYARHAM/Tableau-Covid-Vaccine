@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Covid Vaccines Efficiency</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .visualization-container {
+            width: 90%;
+            height: 680px;
+            overflow: auto;
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .input-container input {
+            margin-right: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            width: 200px;
+        }
+
+        .controls button {
+            width: 80px;
+        }
+    </style>
+
+    <script type="module">
+        // TableauEventType represents the type of Tableau embedding event that can be listened for.
+        import { TableauEventType } from "https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.js";
+
+        // List of visualizations to cycle through.
+        const vizList = ["https://public.tableau.com/views/EfficiencyofVaccinesDashboard_16593841573030/EfficiencyofVaccinesdashboard?:language=en-US&:display_count=n&:origin=viz_share_link",
+            "https://public.tableau.com/views/EfficiencyofVaccinesDashboard_16593841573030/Statewise?:language=en-US&:display_count=n&:origin=viz_share_link",
+            "https://public.tableau.com/views/EfficiencyofVaccinesDashboard_16593841573030/Agewise?:language=en-US&:display_count=n&:origin=viz_share_link",
+            "https://public.tableau.com/shared/RQGSBD7TC?:display_count=n&:origin=viz_share_link",
+            "https://public.tableau.com/views/EfficiencyofVaccinesDashboard_16593841573030/Weekwise?:language=en-US&:display_count=n&:origin=viz_share_link",
+            "https://public.tableau.com/views/EfficiencyofVaccinesDashboard_16593841573030/EfficiencyofVaccinesdashboard?:language=en-US&:display_count=n&:origin=viz_share_link",];
+
+        let vizLen = vizList.length,
+            vizCount = 0;
+
+        function handleFirstInteractive(e) {
+            console.log(`Viz loaded: ${viz.src}`);
+        }
+
+        // Determine the correct visualization to display.
+        function loadViz(vizPlusMinus) {
+            vizCount = vizCount + vizPlusMinus;
+
+            if (vizCount >= vizLen) {
+                // Keep the vizCount in the bounds of the array index.
+                vizCount = 0;
+            } else if (vizCount < 0) {
+                vizCount = vizLen - 1;
+            }
+
+            viz.src = vizList[vizCount];
+        }
+
+        let viz = document.getElementById("tableauViz");
+
+        // Event fired when a viz first becomes interactive.
+        viz.addEventListener(TableauEventType.FirstInteractive, handleFirstInteractive);
+        viz.src = vizList[0];
+
+        // Attach event handlers to the "previous" and "next" button clicks.
+        document.getElementById("previous").onclick = () => loadViz(-1);
+        document.getElementById("next").onclick = () => loadViz(1);
+
+        // Resize functionality
+        function handleResize() {
+            const resizeButton = document.getElementById("resizeViz");
+
+            // Resize the visualization.
+            resizeButton.onclick = () => {
+                viz.width = document.getElementById("resizeWidth").value;
+                viz.height = document.getElementById("resizeHeight").value;
+            }
+        }
+
+        // Event fired when a viz first becomes interactive.
+        viz.addEventListener(TableauEventType.FirstInteractive, handleResize);
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="visualization-container">
+            <!-- Initialization of the Tableau visualization. -->
+            <tableau-viz id="tableauViz" 
+                hide-tabs>
+            </tableau-viz>
+        </div>
+        <!-- User can input a new width and height to resize the visualization. -->
+        <div class="input-container">
+            <input type="text" id="resizeWidth" placeholder="Width">
+            <input type="text" id="resizeHeight" placeholder="Height">
+            <button class="button" id="resizeViz">Resize</button>
+        </div>
+        <!-- Buttons to show the previous or next visualization. -->
+        <div class="controls">
+            <button class="button" id="previous">Previous</button>
+            <button class="button" id="next">Next</button>
+        </div>
+    </div>
+</body>
+
+</html>
